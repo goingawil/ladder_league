@@ -630,12 +630,12 @@ function __wbg_get_imports() {
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm0(arg0, arg1));
     };
-    imports.wbg.__wbindgen_closure_wrapper975 = function(arg0, arg1, arg2) {
-        const ret = makeClosure(arg0, arg1, 126, __wbg_adapter_20);
+    imports.wbg.__wbindgen_closure_wrapper1257 = function(arg0, arg1, arg2) {
+        const ret = makeClosure(arg0, arg1, 153, __wbg_adapter_20);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper3508 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 338, __wbg_adapter_23);
+    imports.wbg.__wbindgen_closure_wrapper3796 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 363, __wbg_adapter_23);
         return addHeapObject(ret);
     };
 
