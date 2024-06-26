@@ -3,6 +3,8 @@ use serde::Deserialize;
 
 const PARTICIPANTS: u32 = 16;
 
+const START_WEEK: &'static str = "6/9/24";
+
 const JSON_DATA: &'static str = r#"
     {
         "weeks": [
@@ -69,36 +71,71 @@ const JSON_DATA: &'static str = r#"
 
 "#;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone, PartialEq)]
 struct WeekList {
     weeks: Vec<Week>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone, PartialEq)]
 struct Week {
     week: String,
     results: Vec<Rung>
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone, PartialEq)]
 struct Rung {
     winner1: String,
     winner2: String,
     loser1: String,
     loser2: String,
 }
-
+// ladder is updated every Sunday
+// let's say ladder is updated Sunday, 6/30
+// the site will then show the ladder after incorporating the results from week 6/23
+// so the week for a given results will actually be a week ahead, i.e. *these are the results we want to show starting the given week*
+// Ladder for 6/30/24
+// {ladder after results from week of 6/23/24}
 #[function_component(App)]
 fn app() -> Html {
 
     //index into WeekList
-    let week_state = use_state(|| 0);
+    let _week_state = use_state(|| 0);
 
-    let week_list: WeekList = serde_json::from_str(JSON_DATA).unwrap();
-    let weeks: Vec<Week> = week_list.weeks;
+    let ladder_league_results: WeekList = serde_json::from_str(JSON_DATA).unwrap();
+    let weeks: Vec<Week> = ladder_league_results.weeks.clone();
 
-    for week in weeks {
-        
+    let ladder_league_start: Week = Week {
+        week: String::from(START_WEEK),
+        results: weeks[0].results.clone(),
+    };
+
+    //vector of ladder leagues, representing history of the league
+    let mut ladder_league_history: WeekList = WeekList {
+        weeks: Vec::<Week>::new()
+    };
+
+    ladder_league_history.weeks.push(ladder_league_start);
+
+    // going through last week's results to calculate this week's display
+    for (i, last_week_results) in ladder_league_results.weeks.iter().enumerate() {
+        let this_week_str = &last_week_results.week;
+
+        let mut this_week_display: Week = Week {
+            week: this_week_str.clone(),
+            results: Vec::<Rung>::with_capacity((PARTICIPANTS/4) as usize),
+        };
+
+        let last_week_display = ladder_league_history.weeks[i].clone();
+        // going through last week's rungs to calculate this week's rungs
+        for (j, rung) in last_week_results.results.iter().enumerate() {
+            // this_week_display.results[j] = Rung {
+            //     winner1: if ,
+            //     winner2: ,
+            //     loser1: ,
+            //     loser2: ,
+            // };
+        }
+        ladder_league_history.weeks.push(this_week_display);
     }
 
 
