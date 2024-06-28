@@ -89,6 +89,63 @@ struct Rung {
     loser1: String,
     loser2: String,
 }
+
+#[derive(Properties, Clone, PartialEq)]
+struct PlayerProps {
+    name: String
+}
+
+#[function_component(Player)]
+fn player(PlayerProps {name}: &PlayerProps) -> Html {
+    html! {
+        <div class={classes!("px-4", "py-2")}>
+            <div class={classes!("bg-violet-200", "h-full", "w-full", "font-bold", "text-xl", "rounded-md", "px-2", "py-1")}>
+                {name}
+            </div>
+        </div>
+    }
+}
+
+#[derive(Properties, Clone, PartialEq)]
+struct WeekDisplayProps {
+    week_state: UseStateHandle<usize>,
+    history_state: UseStateHandle<WeekList>,
+}
+
+#[function_component(WeekDisplay)]
+fn week_display(WeekDisplayProps {week_state, history_state}: &WeekDisplayProps) -> Html {
+    let colors: Vec<&str> = vec!["bg-yellow-300", "bg-red-500", "bg-sky-400", "bg-lime-500"];
+    let names: Vec<&str> = vec!["Champions Club", "Salty Spittoon", "Rivals Ring", "Pickle Pub"];
+
+    let week_displayed: Week = (*(history_state.clone())).weeks[*(week_state.clone())].clone();
+
+    html! {
+        <>
+            <div class={classes!("flex", "flex-col")}>
+                <div class={classes!("justify-center", "flex", "flex-row", "py-2")} style="height:10%;">
+                    <h1 class={classes!("text-3xl", "font-bold")}>{format!("Results for Week {}", week_displayed.week)}</h1>
+                </div>
+                <div>
+                {
+                    week_displayed.results.iter().map(
+                        |rung| {
+                            html! {
+                                <div class={classes!("flex", "flex-row")} style="height:18%;">
+                                    <Player name={rung.clone().winner1} />
+                                    <Player name={rung.clone().winner2} />
+                                    <Player name={rung.clone().loser1} />
+                                    <Player name={rung.clone().loser2} />
+                                </div>
+                            }
+                        }
+                    ).collect::<Html>()
+                }
+                </div>
+            </div>
+        </>
+    }
+}
+
 // ladder is updated every Sunday
 // let's say ladder is updated Sunday, 6/30
 // the site will then show the ladder after incorporating the results from week 6/23
@@ -97,9 +154,6 @@ struct Rung {
 // {ladder after results from week of 6/23/24}
 #[function_component(App)]
 fn app() -> Html {
-
-    //index into WeekList
-    let _week_state = use_state(|| 0);
 
     let ladder_league_results: WeekList = serde_json::from_str(JSON_DATA).unwrap();
     let weeks: Vec<Week> = ladder_league_results.weeks.clone();
@@ -125,22 +179,30 @@ fn app() -> Html {
             results: Vec::<Rung>::with_capacity((PARTICIPANTS/4) as usize),
         };
 
-        let last_week_display = ladder_league_history.weeks[i].clone();
+        // let last_week_display = ladder_league_history.weeks[i].clone();
         // going through last week's rungs to calculate this week's rungs
-        for (j, rung) in last_week_results.results.iter().enumerate() {
-            // this_week_display.results[j] = Rung {
-            //     winner1: if ,
-            //     winner2: ,
-            //     loser1: ,
-            //     loser2: ,
-            // };
+        let len = last_week_results.results.len();
+        let mut j = 0;
+        while j < len {
+            let rung = last_week_results.results[j].clone();
+            this_week_display.results.push(Rung {
+                winner1: if j < last_week_results.results.len() {rung.winner1} else {last_week_results.results[j+1].clone().winner1},
+                winner2: if j < last_week_results.results.len() {rung.winner2} else {last_week_results.results[j+1].clone().winner2},
+                loser1: if j == 0 {rung.loser1} else {last_week_results.results[j-1].clone().loser1},
+                loser2: if j == 0 {rung.loser2} else {last_week_results.results[j-1].clone().loser1},
+            });
+            j += 1;
         }
+
         ladder_league_history.weeks.push(this_week_display);
     }
 
+    let history_state = use_state(|| ladder_league_history.clone());
+    //index into history
+    let week_state = use_state(|| ladder_league_history.clone().weeks.len()-1);
 
     html! {
-        <h1 class={classes!("bg-red-300")}>{"Hello, world!"}</h1>
+        <WeekDisplay week_state={week_state.clone()} history_state={history_state.clone()} />
     }
 }
 
