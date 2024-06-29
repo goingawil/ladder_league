@@ -131,11 +131,6 @@ fn week_display(WeekDisplayProps {week_state, history_state}: &WeekDisplayProps)
                     |(i, rung)| {
                         html! {
                             <div class={classes!("relative","rounded-md", colors[i], "grid", "h-64", "grid-cols-4", "content-center", "justify-items-center", "gap-4")}>
-                                // <div>{"01"}</div>
-                                // <div>{"02"}</div>
-                                // <div>{"03"}</div>
-                                // <div>{"04"}</div>
-                                // <div>{"05"}</div>
                                 <div class={classes!("p-1", "absolute", "top-0")}>
                                     <div class={classes!("font-bold", "text-xl", "rounded-lg", light_colors[i], "p-1", "border", "border-black")}>{names[i]}</div>
                                 </div>
