@@ -197,12 +197,12 @@ fn app() -> Html {
     //index into history
     let week_state = use_state(|| ladder_league_history.clone().weeks.len()-1);
 
-    for week in ladder_league_history.weeks.iter() {
-        web_sys::console::log_1(&(&*format!("week: {}", week.week.clone())).into());
-        for rung in week.results.iter() {
-            web_sys::console::log_1(&(&*format!("{}, {}, {}, {}", rung.winner1, rung.winner2, rung.loser1, rung.loser2)).into());
-        }
-    }
+    // for week in ladder_league_history.weeks.iter() {
+    //     web_sys::console::log_1(&(&*format!("week: {}", week.week.clone())).into());
+    //     for rung in week.results.iter() {
+    //         web_sys::console::log_1(&(&*format!("{}, {}, {}, {}", rung.winner1, rung.winner2, rung.loser1, rung.loser2)).into());
+    //     }
+    // }
 
     html! {
         <WeekDisplay week_state={week_state.clone()} history_state={history_state.clone()} />
