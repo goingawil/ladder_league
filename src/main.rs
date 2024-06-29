@@ -1,7 +1,7 @@
 use yew::prelude::*;
 use serde::Deserialize;
 
-const PARTICIPANTS: u32 = 16;
+// const PARTICIPANTS: u32 = 16;
 
 const START_WEEK: &'static str = "6/9/24";
 
@@ -185,7 +185,7 @@ fn app() -> Html {
         let len = last_week_results.results.len();
         let mut j = 0;
         while j < len {
-            let rung = last_week_results.results[j].clone();
+            // let rung = last_week_results.results[j].clone();
             let last_display_rung = last_week_display.results[j].clone();
             this_week_display.results.push(Rung {
                 winner1: if j == last_week_results.results.len() - 1 {last_display_rung.loser1} else {last_week_results.results[j+1].clone().winner1},
