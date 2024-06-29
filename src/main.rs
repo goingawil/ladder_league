@@ -179,17 +179,18 @@ fn app() -> Html {
             results: Vec::<Rung>::with_capacity((PARTICIPANTS/4) as usize),
         };
 
-        // let last_week_display = ladder_league_history.weeks[i].clone();
+        let last_week_display = ladder_league_history.weeks[i].clone();
         // going through last week's rungs to calculate this week's rungs
         let len = last_week_results.results.len();
         let mut j = 0;
         while j < len {
             let rung = last_week_results.results[j].clone();
+            let last_display_rung = last_week_display.results[j].clone();
             this_week_display.results.push(Rung {
-                winner1: if j < last_week_results.results.len() {rung.winner1} else {last_week_results.results[j+1].clone().winner1},
-                winner2: if j < last_week_results.results.len() {rung.winner2} else {last_week_results.results[j+1].clone().winner2},
-                loser1: if j == 0 {rung.loser1} else {last_week_results.results[j-1].clone().loser1},
-                loser2: if j == 0 {rung.loser2} else {last_week_results.results[j-1].clone().loser1},
+                winner1: if j == last_week_results.results.len() - 1 {last_display_rung.winner1} else {last_week_results.results[j+1].clone().winner1},
+                winner2: if j == last_week_results.results.len() - 1 {last_display_rung.winner2} else {last_week_results.results[j+1].clone().winner2},
+                loser1: if j == 0 {last_display_rung.loser1} else {last_week_results.results[j-1].clone().loser1},
+                loser2: if j == 0 {last_display_rung.loser2} else {last_week_results.results[j-1].clone().loser2},
             });
             j += 1;
         }
