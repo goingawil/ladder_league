@@ -107,6 +107,75 @@ fn player(PlayerProps {name}: &PlayerProps) -> Html {
 }
 
 #[derive(Properties, Clone, PartialEq)]
+struct WeekSelectorProps {
+    week_state: UseStateHandle<usize>,
+    history_state: UseStateHandle<WeekList>,
+    show_weeks: UseStateHandle<bool>,
+}
+
+#[function_component(WeekSelector)]
+fn week_selector(WeekSelectorProps {week_state, history_state, show_weeks}: &WeekSelectorProps) -> Html {
+
+    let week_displayed: Week = (*(history_state.clone())).weeks[*(week_state.clone())].clone();
+
+    let on_click = {
+        let show_weeks = show_weeks.clone();
+        Callback::from(move |_: MouseEvent| {
+            show_weeks.set(!(*(show_weeks.clone())))
+        })
+    };
+
+    html! {
+        <div class={classes!("justify-center", "flex", "flex-row", "py-2", "bg-gray-200")}>
+            <h1 class={classes!("text-3xl", "font-bold")}>{"Results for Week "}</h1>
+            <div class={classes!("px-2")}>
+                <button onclick={on_click.clone()} class={classes!("text-3xl", "font-bold", "px-2", "rounded-md", "bg-white", "border", "border-black")}>{week_displayed.week}</button>
+            </div>
+            <h1 class={classes!("text-xl", "font-bold", "self-center")}>{"(click to change)"}</h1>
+        </div>
+    }
+}
+
+#[derive(Properties, Clone, PartialEq)]
+struct WeekMenuProps {
+    week_state: UseStateHandle<usize>,
+    history_state: UseStateHandle<WeekList>,
+    show_weeks: UseStateHandle<bool>,
+}
+
+#[function_component(WeekMenu)]
+fn week_menu(WeekMenuProps {week_state, history_state, show_weeks}: &WeekMenuProps) -> Html {
+
+    html! {
+        <div class={classes!("absolute", "inset-0","flex", "flex-row", "min-h-screen", "justify-center", "items-center", if *(show_weeks.clone()) {"visible"} else {"invisible"})}>
+            <div class={classes!("z-20", "h-1/3", "w-1/3", "rounded-md", "bg-blue-100", "border-2", "border-black")}>
+                <div class={classes!("max-h-full", "rounded-md", "overflow-y-auto", "p-2")}>
+                    {
+                        history_state.weeks.iter().enumerate().map(
+                            move |(i, week)| {
+                                let on_click = {
+                                    let show_weeks = show_weeks.clone();
+                                    let week_state = week_state.clone();
+                                    Callback::from(move |_: MouseEvent| {
+                                        show_weeks.set(false);
+                                        week_state.set(i);
+                                    })
+                                };
+                                html! {
+                                    <button onclick={on_click.clone()} class={classes!("flex", "justify-center", "h-fit", "w-full", "rounded-md", "border", "border-black", if i==*(week_state.clone()) {"bg-purple-200"} else {"bg-white"})}>
+                                        <span class={classes!("font-bold", "text-2xl")}>{week.clone().week}</span>
+                                    </button>
+                                }
+                            }
+                        ).collect::<Html>()
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+
+#[derive(Properties, Clone, PartialEq)]
 struct WeekDisplayProps {
     week_state: UseStateHandle<usize>,
     history_state: UseStateHandle<WeekList>,
@@ -121,11 +190,7 @@ fn week_display(WeekDisplayProps {week_state, history_state}: &WeekDisplayProps)
     let week_displayed: Week = (*(history_state.clone())).weeks[*(week_state.clone())].clone();
 
     html! {
-        <div>
-            <div class={classes!("justify-center", "flex", "flex-row", "py-2", "bg-gray-200")}>
-                <h1 class={classes!("text-3xl", "font-bold")}>{format!("Results for Week {}", week_displayed.week)}</h1>
-            </div>
-            <div>
+        <div class={classes!("z-0")}>
             {
                 week_displayed.results.iter().enumerate().map(
                     |(i, rung)| {
@@ -143,7 +208,6 @@ fn week_display(WeekDisplayProps {week_state, history_state}: &WeekDisplayProps)
                     }
                 ).collect::<Html>()
             }
-            </div>
         </div>
     }
 }
@@ -196,16 +260,32 @@ fn app() -> Html {
     let history_state = use_state(|| ladder_league_history.clone());
     //index into history
     let week_state = use_state(|| ladder_league_history.clone().weeks.len()-1);
+    let show_weeks = use_state(|| false);
 
-    // for week in ladder_league_history.weeks.iter() {
-    //     web_sys::console::log_1(&(&*format!("week: {}", week.week.clone())).into());
-    //     for rung in week.results.iter() {
-    //         web_sys::console::log_1(&(&*format!("{}, {}, {}, {}", rung.winner1, rung.winner2, rung.loser1, rung.loser2)).into());
-    //     }
-    // }
+    let clickaway = {
+        let show_weeks = show_weeks.clone();
+        Callback::from(move |_: MouseEvent| {
+            show_weeks.set(false)
+        })
+    };
+
 
     html! {
-        <WeekDisplay week_state={week_state.clone()} history_state={history_state.clone()} />
+        <div class={classes!("relative")}>
+            <WeekSelector week_state={week_state.clone()} history_state={history_state.clone()} show_weeks={show_weeks.clone()}/>
+            <WeekDisplay week_state={week_state.clone()} history_state={history_state.clone()} />
+            {if *show_weeks.clone() {
+                html!{
+                    <>
+                    <WeekMenu week_state={week_state.clone()} history_state={history_state.clone()} show_weeks={show_weeks.clone()}/>
+                    <div onclick={clickaway.clone()} class={classes!("absolute", "inset-0", "z-10")}></div>
+                    </>
+                }
+            }
+            else {
+                html!{}
+            }}
+        </div>
     }
 }
 
