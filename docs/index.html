@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Ladder League</title>
+        <link rel="stylesheet" href="/ladder_league/tailwind-840a99b2e6890dfa.css" integrity="sha384&#x2D;PJet&#x2B;LFWsotOvhWTfPxOQ3QRjxDbfAn0qbee1VMoMzoO4tKgyNyubyU1tr5oHe9p"/>
+        <base href="/ladder_league/" />
+    
+<link rel="modulepreload" href="/ladder_league/ladder_league-630a8b13254959f2.js" crossorigin=anonymous integrity="sha384-ucDsjeizs/gTOKGVYpDsYH+6nfsgiNKkG+EUlDOV4DRHuMTCjPK2D8Oix6bFcJAS">
+<link rel="preload" href="/ladder_league/ladder_league-630a8b13254959f2_bg.wasm" crossorigin=anonymous integrity="sha384-NBQQUC34hRrxikvOBABPF1PO4+kD007BJLCBhIZLGxXwBuT8Xt11E29vkwXvGeZd" as="fetch" type="application/wasm"></head>
+    <body>
+<script type="module" nonce="124/PCEaETzSUESC6FckOQ==">
+import init, * as bindings from '/ladder_league/ladder_league-630a8b13254959f2.js';
+const wasm = await init('/ladder_league/ladder_league-630a8b13254959f2_bg.wasm');
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script></body>
+</html>
