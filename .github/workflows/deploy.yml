@@ -2,8 +2,6 @@ name: Deploy Ladder
 on:
   workflow_run:
     branches: [main]
-    workflows: [Continuous integration]
-    types: [completed]
 
 jobs:
   release:
