@@ -1,66 +1,96 @@
 name: Deploy Ladder
-
 on:
-  push:
+  workflow_run:
     branches: [main]
-
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
+    workflows: [Continuous integration]
+    types: [completed]
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Restore cache
-        uses: actions/cache@v4
+      - uses: actions-rs/toolchain@v1
         with:
-          path: |
-            ~/.cargo/bin
-            ~/.cargo/git
-            ~/.cargo/registry
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          toolchain: stable
+          target: wasm32-unknown-unknown
 
-      - name: Install dependencies
-        run: |
-          cargo install trunk || true \
-            && rustup target add wasm32-unknown-unknown
+      - uses: jetli/trunk-action@v0.1.0
+      - uses: jetli/wasm-bindgen-action@v0.1.0
 
-      - name: Build the Rust WASM app and all of its assets
-        run: trunk build
+      - uses: actions/checkout@v2
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - run: trunk build --release
+
+      - uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
         with:
-          path: './dist'
+          github_token: $
+          publish_dir: ./dist
 
-  deploy:
-    needs: build
 
-#    permissions:
-#      pages: write
-#      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+#name: Deploy Ladder
+#
+#on:
+#  push:
+#    branches: [main]
+#
+#  workflow_dispatch:
+#
+#permissions:
+#  contents: read
+#  pages: write
+#  id-token: write
+#
+#concurrency:
+#  group: pages
+#  cancel-in-progress: true
+#
+#jobs:
+#  build:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#      - name: Restore cache
+#        uses: actions/cache@v4
+#        with:
+#          path: |
+#            ~/.cargo/bin
+#            ~/.cargo/git
+#            ~/.cargo/registry
+#            target
+#          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+#
+#      - name: Install dependencies
+#        run: |
+#          cargo install trunk || true \
+#            && rustup target add wasm32-unknown-unknown
+#
+#      - name: Build the Rust WASM app and all of its assets
+#        run: trunk build
+#
+#      - name: Setup Pages
+#        uses: actions/configure-pages@v4
+#      - name: Upload artifact
+#        uses: actions/upload-pages-artifact@v3
+#        with:
+#          path: './dist'
+#
+#  deploy:
+#    needs: build
+#
+##    permissions:
+##      pages: write
+##      id-token: write
+#    environment:
+#      name: github-pages
+#      url: ${{ steps.deployment.outputs.page_url }}
+#
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Deploy to GitHub Pages
+#        id: deployment
+#        uses: actions/deploy-pages@v4
 
 #name: CD - Deploy League
 #
