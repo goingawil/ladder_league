@@ -99,7 +99,7 @@ struct PlayerProps {
 fn player(PlayerProps {name}: &PlayerProps) -> Html {
     html! {
         <div class={classes!("px-4", "py-2", "w-fit", "justify-center")}>
-            <div class={classes!("bg-gray-200", "h-fit", "font-bold", "text-2xl", "rounded-md", "px-2", "py-1", "border-2", "border-gray-700")}>
+            <div class={classes!("bg-gray-200", "h-fit", "font-bold", "text-4xl", "rounded-md", "px-2", "py-1", "border-2", "border-gray-700")}>
                 {name}
             </div>
         </div>
@@ -126,12 +126,12 @@ fn week_selector(WeekSelectorProps {week_state, history_state, show_weeks}: &Wee
     };
 
     html! {
-        <div class={classes!("justify-center", "flex", "flex-row", "py-2", "bg-gray-200")}>
-            <h1 class={classes!("text-3xl", "font-bold")}>{"Results for Week "}</h1>
-            <div class={classes!("px-2")}>
-                <button onclick={on_click.clone()} class={classes!("text-3xl", "font-bold", "px-2", "rounded-md", "bg-white", "border", "border-black")}>{week_displayed.week}</button>
+        <div class={classes!("justify-center", "flex", "flex-row", "py-2", "bg-gray-200", "h-32", "items-center")}>
+            <h1 class={classes!("text-6xl", "font-bold")}>{"Results for Week "}</h1>
+            <div class={classes!("p-2")}>
+                <button onclick={on_click.clone()} class={classes!("text-6xl", "font-bold", "px-2", "rounded-md", "bg-white", "border", "border-black")}>{week_displayed.week}</button>
             </div>
-            <h1 class={classes!("text-xl", "font-bold", "self-center")}>{"(click to change)"}</h1>
+            <h1 class={classes!("text-3xl", "font-bold")}>{"(click to change)"}</h1>
         </div>
     }
 }
@@ -147,7 +147,7 @@ struct WeekMenuProps {
 fn week_menu(WeekMenuProps {week_state, history_state, show_weeks}: &WeekMenuProps) -> Html {
 
     html! {
-        <div class={classes!("absolute", "inset-0","flex", "flex-row", "min-h-screen", "justify-center", "items-center", if *(show_weeks.clone()) {"visible"} else {"invisible"})}>
+        <div class={classes!(if *show_weeks.clone() {"visible"} else {"invisible"}, "absolute", "inset-0","flex", "flex-row", "min-h-screen", "justify-center", "items-center", if *(show_weeks.clone()) {"visible"} else {"invisible"})}>
             <div class={classes!("z-20", "h-1/3", "w-1/3", "rounded-md", "bg-blue-100", "border-2", "border-black")}>
                 <div class={classes!("max-h-full", "rounded-md", "overflow-y-auto", "p-2")}>
                     {
@@ -163,7 +163,7 @@ fn week_menu(WeekMenuProps {week_state, history_state, show_weeks}: &WeekMenuPro
                                 };
                                 html! {
                                     <button onclick={on_click.clone()} class={classes!("flex", "justify-center", "h-fit", "w-full", "rounded-md", "border", "border-black", if i==*(week_state.clone()) {"bg-purple-200"} else {"bg-white"})}>
-                                        <span class={classes!("font-bold", "text-2xl")}>{week.clone().week}</span>
+                                        <span class={classes!("font-bold", "text-4xl")}>{week.clone().week}</span>
                                     </button>
                                 }
                             }
@@ -197,7 +197,7 @@ fn week_display(WeekDisplayProps {week_state, history_state}: &WeekDisplayProps)
                         html! {
                             <div class={classes!("relative","rounded-md", colors[i], "grid", "h-96", "grid-cols-4", "content-center", "justify-items-center", "gap-4")}>
                                 <div class={classes!("p-1", "absolute", "top-0")}>
-                                    <div class={classes!("font-bold", "text-xl", "rounded-lg", light_colors[i], "p-1", "border", "border-black")}>{names[i]}</div>
+                                    <div class={classes!("font-bold", "text-2xl", "rounded-lg", light_colors[i], "p-1", "border", "border-black")}>{names[i]}</div>
                                 </div>
                                 <Player name={rung.clone().winner1} />
                                 <Player name={rung.clone().winner2} />
@@ -274,17 +274,8 @@ fn app() -> Html {
         <div class={classes!("relative")}>
             <WeekSelector week_state={week_state.clone()} history_state={history_state.clone()} show_weeks={show_weeks.clone()}/>
             <WeekDisplay week_state={week_state.clone()} history_state={history_state.clone()} />
-            {if *show_weeks.clone() {
-                html!{
-                    <>
-                    <WeekMenu week_state={week_state.clone()} history_state={history_state.clone()} show_weeks={show_weeks.clone()}/>
-                    <div onclick={clickaway.clone()} class={classes!("absolute", "inset-0", "z-10")}></div>
-                    </>
-                }
-            }
-            else {
-                html!{}
-            }}
+            <WeekMenu week_state={week_state.clone()} history_state={history_state.clone()} show_weeks={show_weeks.clone()}/>
+            <div onclick={clickaway.clone()} class={classes!("absolute", "inset-0", "z-10", if *show_weeks.clone() {"visible"} else {"invisible"})}></div>
         </div>
     }
 }
