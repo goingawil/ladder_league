@@ -116,12 +116,12 @@ struct WeekSelectorProps {
 #[function_component(WeekSelector)]
 fn week_selector(WeekSelectorProps {week_state, history_state, show_weeks}: &WeekSelectorProps) -> Html {
 
-    let week_displayed: Week = (*(history_state.clone())).weeks[*(week_state.clone())].clone();
+    let week_displayed: &Week = &(*(history_state)).weeks[*week_state.clone()];
 
     let on_click = {
         let show_weeks = show_weeks.clone();
         Callback::from(move |_: MouseEvent| {
-            show_weeks.set(!(*(show_weeks.clone())))
+            show_weeks.set(!(*(show_weeks)))
         })
     };
 
@@ -129,7 +129,7 @@ fn week_selector(WeekSelectorProps {week_state, history_state, show_weeks}: &Wee
         <div class={classes!("justify-center", "flex", "flex-row", "py-2", "bg-gray-200", "h-32", "items-center")}>
             <h1 class={classes!("text-6xl", "font-bold")}>{"Results for Week "}</h1>
             <div class={classes!("p-2")}>
-                <button onclick={on_click.clone()} class={classes!("text-6xl", "font-bold", "px-2", "rounded-md", "bg-white", "border", "border-black")}>{week_displayed.week}</button>
+                <button onclick={on_click} class={classes!("text-6xl", "font-bold", "px-2", "rounded-md", "bg-white", "border", "border-black")}>{&week_displayed.week}</button>
             </div>
             <h1 class={classes!("text-3xl", "font-bold")}>{"(click to change)"}</h1>
         </div>
@@ -147,7 +147,7 @@ struct WeekMenuProps {
 fn week_menu(WeekMenuProps {week_state, history_state, show_weeks}: &WeekMenuProps) -> Html {
 
     html! {
-        <div class={classes!(if *show_weeks.clone() {"visible"} else {"invisible"}, "absolute", "inset-0","flex", "flex-row", "min-h-screen", "justify-center", "items-center", if *(show_weeks.clone()) {"visible"} else {"invisible"})}>
+        <div class={classes!(if **show_weeks {"visible"} else {"invisible"}, "absolute", "inset-0","flex", "flex-row", "min-h-screen", "justify-center", "items-center")}>
             <div class={classes!("z-20", "h-1/3", "w-1/3", "rounded-md", "bg-blue-100", "border-2", "border-black")}>
                 <div class={classes!("max-h-full", "rounded-md", "overflow-y-auto", "p-2")}>
                     {
@@ -162,8 +162,8 @@ fn week_menu(WeekMenuProps {week_state, history_state, show_weeks}: &WeekMenuPro
                                     })
                                 };
                                 html! {
-                                    <button onclick={on_click.clone()} class={classes!("flex", "justify-center", "h-fit", "w-full", "rounded-md", "border", "border-black", if i==*(week_state.clone()) {"bg-purple-200"} else {"bg-white"})}>
-                                        <span class={classes!("font-bold", "text-4xl")}>{week.clone().week}</span>
+                                    <button onclick={on_click} class={classes!("flex", "justify-center", "h-fit", "w-full", "rounded-md", "border", "border-black", if i==**week_state {"bg-purple-200"} else {"bg-white"})}>
+                                        <span class={classes!("font-bold", "text-4xl")}>{&week.week}</span>
                                     </button>
                                 }
                             }
@@ -187,7 +187,7 @@ fn week_display(WeekDisplayProps {week_state, history_state}: &WeekDisplayProps)
     let light_colors: Vec<&str> = vec!["bg-yellow-100", "bg-red-100", "bg-sky-100", "bg-lime-100"];
     let names: Vec<&str> = vec!["Champions Club", "Salty Spittoon", "Rivals Ring", "Pickle Pub"];
 
-    let week_displayed: Week = (*(history_state.clone())).weeks[*(week_state.clone())].clone();
+    let week_displayed: &Week = &(*(history_state)).weeks[*week_state.clone()];
 
     html! {
         <div class={classes!("z-0")}>
@@ -199,10 +199,10 @@ fn week_display(WeekDisplayProps {week_state, history_state}: &WeekDisplayProps)
                                 <div class={classes!("p-1", "absolute", "top-0")}>
                                     <div class={classes!("font-bold", "text-2xl", "rounded-lg", light_colors[i], "p-1", "border", "border-black")}>{names[i]}</div>
                                 </div>
-                                <Player name={rung.clone().winner1} />
-                                <Player name={rung.clone().winner2} />
-                                <Player name={rung.clone().loser1} />
-                                <Player name={rung.clone().loser2} />
+                                <Player name={rung.winner1.clone()} />
+                                <Player name={rung.winner2.clone()} />
+                                <Player name={rung.loser1.clone()} />
+                                <Player name={rung.loser2.clone()} />
                             </div>
                         }
                     }
@@ -247,10 +247,10 @@ fn app() -> Html {
             // let rung = last_week_results.results[j].clone();
             let last_display_rung = last_week_display.results[j].clone();
             this_week_display.results.push(Rung {
-                winner1: if j == last_week_results.results.len() - 1 {last_display_rung.loser1} else {last_week_results.results[j+1].clone().winner1},
-                winner2: if j == last_week_results.results.len() - 1 {last_display_rung.loser2} else {last_week_results.results[j+1].clone().winner2},
-                loser1: if j == 0 {last_display_rung.winner1} else {last_week_results.results[j-1].clone().loser1},
-                loser2: if j == 0 {last_display_rung.winner2} else {last_week_results.results[j-1].clone().loser2},
+                winner1: if j == last_week_results.results.len() - 1 {last_display_rung.loser1} else {last_week_results.results[j+1].winner1.clone()},
+                winner2: if j == last_week_results.results.len() - 1 {last_display_rung.loser2} else {last_week_results.results[j+1].winner2.clone()},
+                loser1: if j == 0 {last_display_rung.winner1} else {last_week_results.results[j-1].loser1.clone()},
+                loser2: if j == 0 {last_display_rung.winner2} else {last_week_results.results[j-1].loser2.clone()},
             });
             j += 1;
         }
@@ -259,7 +259,7 @@ fn app() -> Html {
 
     let history_state = use_state(|| ladder_league_history.clone());
     //index into history
-    let week_state = use_state(|| ladder_league_history.clone().weeks.len()-1);
+    let week_state = use_state(|| ladder_league_history.weeks.len()-1);
     let show_weeks = use_state(|| false);
 
     let clickaway = {
@@ -275,7 +275,7 @@ fn app() -> Html {
             <WeekSelector week_state={week_state.clone()} history_state={history_state.clone()} show_weeks={show_weeks.clone()}/>
             <WeekDisplay week_state={week_state.clone()} history_state={history_state.clone()} />
             <WeekMenu week_state={week_state.clone()} history_state={history_state.clone()} show_weeks={show_weeks.clone()}/>
-            <div onclick={clickaway.clone()} class={classes!("absolute", "inset-0", "z-10", if *show_weeks.clone() {"visible"} else {"invisible"})}></div>
+            <div onclick={clickaway.clone()} class={classes!("absolute", "inset-0", "z-10", if *show_weeks {"visible"} else {"invisible"})}></div>
         </div>
     }
 }
